@@ -1,4 +1,10 @@
-import { useState, useContext } from "react";
+import {
+  useState,
+  useContext,
+  useDeferredValue,
+  useMemo,
+  useTransition,
+} from "react";
 import Pet from "./pet";
 import useBreedList from "./useBreedList";
 import Results from "./Result";
@@ -18,8 +24,15 @@ const SearchParams = () => {
   const [breeds] = useBreedList(animal);
   const [adoptedPet] = useContext(AdoptedPetContext);
 
+  const [isPending, startTransition] = useTransition();
+
   const results = useQuery(["search", requestParams], fetchSearch);
   const pets = results?.data?.pets ?? [];
+  const deferredPets = useDeferredValue(pets);
+  const renderedPets = useMemo(
+    () => <Results pets={deferredPets} />,
+    [deferredPets]
+  );
 
   return (
     <div className="search-params">
@@ -32,7 +45,9 @@ const SearchParams = () => {
             breed: formData.get("breed") ?? "",
             location: formData.get("location") ?? "",
           };
-          setRequestParams(obj);
+          startTransition(() => {
+            setRequestParams(obj);
+          });
         }}
       >
         {adoptedPet ? (
@@ -71,10 +86,16 @@ const SearchParams = () => {
             ))}
           </select>
         </label>
-        <button>Submit</button>
+        {isPending ? (
+          <div className="mini loading-pane">
+            <h2 className="loader">...</h2>
+          </div>
+        ) : (
+          <button>Submit</button>
+        )}
       </form>
 
-      <Results pets={pets} />
+      {renderedPets}
     </div>
   );
 };
