@@ -10,9 +10,14 @@ const Modal = lazy(() => import("./Modal"));
 
 const Details = () => {
   const { id } = useParams();
+
+  if (!id) {
+    throw new Error("ID needed");
+  }
   const results = useQuery(["details", id], fetchPet);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, setAdoptedPet] = useContext(AdoptedPetContext);
 
   if (results.isLoading) {
@@ -23,7 +28,10 @@ const Details = () => {
     );
   }
 
-  const pet = results.data.pets[0];
+  const pet = results?.data?.pets[0];
+  if (!pet) {
+    throw new Error("no pet LOL");
+  }
 
   return (
     <div className="details">
@@ -58,10 +66,10 @@ const Details = () => {
   );
 };
 
-function DetailsErrorBoundary(props) {
+function DetailsErrorBoundary() {
   return (
     <ErrorBoundary>
-      <Details {...props} />
+      <Details />
     </ErrorBoundary>
   );
 }

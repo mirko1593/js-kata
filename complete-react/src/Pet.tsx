@@ -1,6 +1,19 @@
+import { FunctionComponent } from "react";
 import { Link } from "react-router-dom";
+import { Animal } from "./APIResponseTypes";
 
-const Pet = ({ name, animal, breed, images, location, id }) => {
+interface IProps {
+  name: string;
+  animal: Animal;
+  breed: string;
+  images: string[];
+  location: string;
+  id: number;
+}
+
+const Pet: FunctionComponent<IProps> = (props: IProps) => {
+  const { name, animal, breed, images, location, id } = props;
+
   let hero = "http://pets-images.dev-apis.com/pets/none.jpg";
   if (images.length) {
     hero = images[0];
@@ -18,14 +31,6 @@ const Pet = ({ name, animal, breed, images, location, id }) => {
         </h2>
       </div>
     </Link>
-  );
-
-  return (
-    <div>
-      <h1>{props.name}</h1>
-      <h2>{props.animal}</h2>
-      <h2>{props.breed}</h2>
-    </div>
   );
 };
 
